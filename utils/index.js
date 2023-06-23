@@ -7,9 +7,6 @@ import { normalize, chineseReg } from './hash'
 import { send as httpSend } from '@onflow/transport-http'
 import { send as grpcSend } from '@onflow/transport-grpc'
 import { init } from '@onflow/fcl-wc'
-import firebase from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
-import { initializeApp } from 'firebase/app'
 
 import {
   nodeUrl,
@@ -26,7 +23,7 @@ import {
   rpcType,
   flowscanKey,
   flowscanUrl,
-  catalogAddr
+  catalogAddr,
 } from '../config/constants'
 import { emojis } from './emojis'
 import emojiRegex from 'emoji-regex'
@@ -385,6 +382,18 @@ export const conpareKeys = (a = {}, b = {}) => {
   return key
 }
 
+export const getRarityColor = (rarity) => {
+  if (rarity == 'rare') {
+    return 'text-blue-800 bg-blue-100'
+  } else if (rarity == 'epic') {
+    return 'text-yellow-800 bg-yellow-100'
+  } else if (rarity == 'legendary') {
+    return 'text-purple-800 bg-purple-100'
+  } else {
+    return 'text-gray-800 bg-gray-100'
+  }
+}
+
 export const hashAlgoEnum = [
   '',
   'SHA2_256',
@@ -416,4 +425,95 @@ export const raw2SigStr = (code) => {
 
 export const raw2HashStr = (code) => {
   return hashAlgoEnum[code]
+}
+
+// collection
+
+export const getResourceType = (type) => {
+  if (!type) return null
+  if (type.kind == 'Resource') return type.typeID
+  if (type.kind == 'AnyResource') return 'AnyResource'
+  if (!type.type) return null
+  return getResourceType(type.type)
+}
+
+export const getContract = (typeID) => {
+  const comps = typeID.split('.')
+  const contract = [comps[0], comps[1], comps[2]].join('.')
+  return contract
+}
+
+export const collectionsWithExtraData = (collections) => {
+  return collections.map((c) => {
+    if (c.collectionIdentifier) {
+      return c
+    }
+
+    let resourceType = getResourceType(c.type)
+    let contract = c.path.replace('/storage/', '')
+    let contractName = contract
+    if (resourceType != 'AnyResource') {
+      contract = getContract(resourceType)
+      let comps = contract.split('.')
+      contractName = comps[comps.length - 1]
+    }
+
+    return { ...c, contract: contract, contractName: contractName }
+  })
+}
+
+export const collectionsWithDisplayInfo = (collections) => {
+  const newCollections = []
+  for (let i = 0; i < collections.length; i++) {
+    const collection = Object.assign({}, collections[i])
+    if (collection.display) {
+      collection.name = collection.display.name
+      collection.squareImage = collection.display.squareImage
+    }
+    newCollections.push(collection)
+  }
+  return newCollections
+}
+
+export const collectionsWithCatalogInfo = (collections, nftCatalog) => {
+  const catalogPathMap = {}
+  for (const [collectionID, catalog] of Object.entries(nftCatalog)) {
+    const path = catalog.collectionData.storagePath
+    catalogPathMap[`/${path.domain}/${path.identifier}`] = {
+      collectionIdentifier: collectionID,
+      catalog: catalog,
+    }
+  }
+
+  const newCollections = []
+  for (let i = 0; i < collections.length; i++) {
+    const collection = Object.assign({}, collections[i])
+    const catalogInfo = catalogPathMap[collection.path]
+    if (catalogInfo) {
+      collection.collectionIdentifier = catalogInfo.collectionIdentifier
+      collection.name = catalogInfo.catalog.collectionDisplay.name
+      collection.squareImage = catalogInfo.catalog.collectionDisplay.squareImage
+      collection.socials = catalogInfo.catalog.collectionDisplay.socials
+      collection.externalURL = catalogInfo.catalog.collectionDisplay.externalURL
+      collection.description = catalogInfo.catalog.collectionDisplay.description
+      collection.contractName = catalogInfo.catalog.contractName
+      collection.contractAddress = catalogInfo.catalog.contractAddress
+      collection.publicPathIdentifier =
+        catalogInfo.catalog.collectionData.publicPath.identifier
+      collection.uuid = `A.${collection.contractAddress.replace('0x', '')}.${
+        collection.contractName
+      }`
+    }
+    collection.addedCatalogInfo = true
+    newCollections.push(collection)
+  }
+  return newCollections
+}
+
+export const getContractLink = (contractUUID) => {
+  if (publicConfig.chainEnv == 'mainnet') {
+    return `https://contractbrowser.com/${contractUUID}`
+  } else {
+    return `${publicConfig.flowscanURL}/contract/${contractUUID}`
+  }
 }

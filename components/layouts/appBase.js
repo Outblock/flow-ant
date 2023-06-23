@@ -31,7 +31,7 @@ export default function Layout({ children }) {
   return (
     <>
       <Head>
-        <title>Flow Migration</title>
+        <title>Flow Ant</title>
       </Head>
       <main>
         <Container px={['5%', '15%']} w="100%" h="100%" maxW="1440px">

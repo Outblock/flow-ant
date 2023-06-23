@@ -26,7 +26,11 @@ import {
   readPendingTrx,
 } from './index'
 import { namehash } from '../utils/hash'
-import { postQuery } from '../utils'
+import {
+  postQuery,
+  collectionsWithCatalogInfo,
+  collectionsWithExtraData,
+} from '../utils'
 
 import {
   getPrivatePaths,
@@ -210,15 +214,20 @@ export const useAccount = (address) => {
     try {
       const account = await fcl.account(address)
 
-      // const privatePaths = await getPrivatePaths(address)
-      const storagePaths = await getStoragePaths(address)
-      console.log(storagePaths)
+      const storedItems = await bulkGetStoredItems(address)
 
-      const privatePaths = await bulkGetNftCatalog(address)
+      const nftStorages = storedItems.filter(
+        (item) => item.isNFTCollection && item.tokenIDs.length >= 0,
+      )
+      const catalogs = await bulkGetNftCatalog()
 
-      console.log(privatePaths)
-      // console.log(history, parentName)
-      return account
+      const nftCollections = collectionsWithExtraData(
+        collectionsWithCatalogInfo(nftStorages, catalogs),
+      )
+
+      console.log(nftStorages)
+
+      return { ...account, nftCollections }
     } catch (error) {
       console.log(error)
       return {}

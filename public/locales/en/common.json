@@ -35,5 +35,11 @@
     "single.weight.warning": "A single key weighs too much",
     "single.weight.warning.desc": "Find a single key with a weight equal to 1000, which makes multi-signature wallets useless",
     "weight.not.enough.desc": "The total weight of the keys are less than 1000, which will cause the multi-signature account to be unavailable. Please adjust the weight and reconfirm.",
-    "weight.exceed.desc": "The sum of the weights is more than 1000, please make sure the multi-signature weight is reasonable."
+    "weight.exceed.desc": "The sum of the weights is more than 1000, please make sure the multi-signature weight is reasonable.",
+    "step.first": "First",
+    "step.second": "Select your collections",
+    "step.third": "Second",
+    "step.first.desc": "Init your collections",
+    "step.second.desc": "Third",
+    "step.third.desc": "Migrate your NFTs"
 }

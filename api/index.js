@@ -18,13 +18,7 @@ import {
 import { isFlowAddr, getQuery, db } from '../utils'
 import { namehash } from '../utils/hash'
 import axios from 'axios'
-import {
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-  deleteDoc,
-} from 'firebase/firestore'
+
 import * as sdk from '@onflow/sdk'
 
 import { outdatedPathsMainnet } from 'config/outdated_paths/mainnet'
@@ -534,6 +528,51 @@ const getCatalogTypeData = async () => {
   const typeData = await buildAndExecScript('query_catalog_type_data', [])
 
   return typeData
+}
+
+// --- Collections ---
+
+export const getNftMetadataViews = async (address, storagePathID, tokenID) => {
+  const metadata = await buildAndExecScript('query_catalog_type_data', [
+    fcl.arg(address, t.Address),
+    fcl.arg(storagePathID, t.String),
+    fcl.arg(tokenID, t.UInt64),
+  ])
+
+  return metadata
+}
+
+export const getNftViews = async (address, storagePathID, tokenIDs) => {
+  const ids = tokenIDs.map((id) => `${id}`)
+  console.log(ids)
+  const displays = await buildAndExecScript('query_nft_displays', [
+    fcl.arg(address, t.Address),
+    fcl.arg(storagePathID, t.String),
+    fcl.arg(ids, t.Array(t.UInt64)),
+  ])
+
+  return displays
+}
+
+export const bulkGetNftViews = async (
+  address,
+  collection,
+  limit = 1000,
+  offset = 0,
+) => {
+  const totalTokenIDs = collection.tokenIDs
+  const tokenIDs = totalTokenIDs.slice(offset, offset + limit)
+
+  const groups = splitList(tokenIDs, 20)
+  const promises = groups.map((group) => {
+    return getNftViews(address, collection.path.replace('/storage/', ''), group)
+  })
+  const displayGroups = await Promise.all(promises)
+  const displays = displayGroups.reduce((acc, current) => {
+    return Object.assign(acc, current)
+  }, {})
+
+  return displays
 }
 
 // --- Storage Items ---
