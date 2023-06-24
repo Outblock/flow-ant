@@ -693,6 +693,51 @@ transaction(publicKeys: [String], signatureAlgorithms: [UInt8], hashAlgorithms: 
     }   
 }`
 
+const batch_init_nft_storages = ({ importScripts = '', initScripts = '' }) => {
+  return fcl.cdc`
+  
+  import NonFungibleToken from 0xNonFungibleToken
+  ${importScripts}
+  
+  transaction() {
+    prepare(account: AuthAccount) {
+      ${initScripts}
+    }
+  }
+  `
+}
+
+const batch_send_nfts = ({
+  importScripts = '',
+  initScripts = '',
+  borrowScripts = '',
+  executeScripts = '',
+}) => {
+  return fcl.cdc`
+  
+  import NonFungibleToken from 0xNonFungibleToken
+  ${importScripts}
+  
+  transaction() {
+
+      ${initScripts}
+      
+    prepare(account: AuthAccount) {
+
+      ${initScripts}
+
+      ${borrowScripts}
+    }
+
+    execute {
+
+      ${executeScripts}
+
+    }
+  }
+  `
+}
+
 export const transactions = {
   register_domain,
   register_domain_with_fusd,
@@ -720,6 +765,8 @@ export const transactions = {
   renew_domain_with_hash,
   batch_renew_domain_with_hash,
   create_account,
+  batch_init_nft_storages,
+  batch_send_nfts,
 }
 
 export const buildAndSendTrx = async (key, args = [], opt = {}) => {
@@ -745,7 +792,7 @@ export const buildAndSendTrxWithId = async (key, args = [], opt = {}) => {
     }
     const trxId = await sendTrx(trxScript, args)
     const txStatus = await fcl.tx(trxId).onceSealed()
-    return {trxId, txStatus}
+    return { trxId, txStatus }
   } catch (error) {
     console.log(error)
     return null

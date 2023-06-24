@@ -38,8 +38,14 @@
     "weight.exceed.desc": "The sum of the weights is more than 1000, please make sure the multi-signature weight is reasonable.",
     "step.first": "First",
     "step.second": "Select your collections",
+    "step.second.tips": "Please do not close this tab",
     "step.third": "Second",
+    "step.third.tips": "Please do not close this tab",
     "step.first.desc": "Init your collections",
     "step.second.desc": "Third",
-    "step.third.desc": "Migrate your NFTs"
+    "step.third.desc": "Migrate your NFTs",
+    "select.all": "Select all",
+    "cancle.all": "Cancle.all",
+    "connect.with.target": "Wating for target connected...",
+    "connect.with.source": "Wating for source connected..."
 }

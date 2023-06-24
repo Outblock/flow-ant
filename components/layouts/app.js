@@ -22,6 +22,7 @@ import { useUserCollection } from '../../api/query'
 import { initDomainCollection } from '../../api'
 import { toast } from '../../utils'
 import PendingTrxModal from 'components/pendingTrxModal'
+import migrationStore from 'stores/migration'
 
 export default function Layout({ children }) {
   fclinit()
@@ -37,6 +38,8 @@ export default function Layout({ children }) {
     colorMode === 'light' ? theme.colors.lightPrimary : theme.colors.primary
   const { user = {} } = accountStore.useState('user')
   const { addr = '' } = user
+
+  const { currentStep } = migrationStore.useState('currentStep')
 
   const {
     data = {},
@@ -85,7 +88,7 @@ export default function Layout({ children }) {
           <Header />
 
           <Box py={[5, 5, 10]} pr={18}></Box>
-          {addr ? renderChildren() : renderConnectPanel()}
+          {addr || currentStep >= 1 ? renderChildren() : renderConnectPanel()}
         </Container>
         <PendingTrxModal />
       </main>

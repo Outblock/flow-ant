@@ -313,7 +313,7 @@ export const transferNFT = async (type, id, to) => {
   let scriptName = ''
   let args = []
   switch (type) {
-    case 'Domains':
+    case '${contractName}':
       const nameHash = await calcHash(...id.split('.'))
 
       scriptName = 'transfer_domain_with_hash_name'
@@ -554,6 +554,25 @@ export const getNftViews = async (address, storagePathID, tokenIDs) => {
   return displays
 }
 
+export const getCollectionsNFTViews = async (collections = [], address) => {
+  const promises = []
+
+  collections.map((col) => {
+    promises.push(bulkGetNftViews(address, col))
+  })
+
+  const datas = await Promise.all(promises)
+
+  const dataMap = {}
+
+  datas.map((data, idx) => {
+    const path = collections[idx].path
+    dataMap[path] = data
+  })
+
+  return dataMap
+}
+
 export const bulkGetNftViews = async (
   address,
   collection,
@@ -783,6 +802,102 @@ export const readSharedAccount = async (address) => {
   const data = docSnap.data()
 
   return data
+}
+
+export const buildInitScripts = async (collections = {}) => {
+  let paths = Object.keys(collections)
+
+  let importScripts = ``
+  let initScripts = ``
+  paths.map((path) => {
+    const collection = collections[path]
+    console.log(collection)
+    const { contractAddress, contractName } = collection
+    let importScript = `
+
+    import ${contractName} from ${contractAddress}
+
+    `
+
+    let initScript = `
+
+      if account.getCapability<&{NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath).check() == false {
+        if account.borrow<&${contractName}.Collection>(from: ${contractName}.CollectionStoragePath) !=nil {
+          account.unlink(${contractName}.CollectionPublicPath)
+          account.link<&${contractName}.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ${contractName}.CollectionPublic}>(${contractName}.CollectionPublicPath, target: ${contractName}.CollectionStoragePath)
+        } else {
+          account.save(<- ${contractName}.createEmptyCollection(), to: ${contractName}.CollectionStoragePath)
+          account.link<&${contractName}.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ${contractName}.CollectionPublic}>(${contractName}.CollectionPublicPath, target: ${contractName}.CollectionStoragePath)
+        }
+      }
+
+    `
+    importScripts = importScripts + importScript
+    initScripts = initScripts + initScript
+  })
+
+  // console.log(importScripts, initScripts, '======')
+  const res = await buildAndSendTrx('batch_init_nft_storages', [], {
+    importScripts,
+    initScripts,
+  })
+  console.log(res)
+  return res
+}
+
+export const buildTransferScripts = async (collections, targetAddress) => {
+  let paths = Object.keys(collections)
+
+  let importScripts = ``
+  let initScripts = ``
+  let borrowScripts = ``
+  let executeScripts = ``
+  paths.map((path) => {
+    const collection = collections[path]
+    console.log(collection)
+    const { contractAddress, contractName, selectedTokenIDs = [] } = collection
+    let importScript = `
+
+      import ${contractName} from ${contractAddress}
+    `
+
+    let initScript = `
+
+      var senderr${contractName}Collection: &${contractName}.Collection
+      var receiver${contractName}Collection: &{NonFungibleToken.Receiver}
+    `
+
+    let borrowScript = `
+
+      self.sender${contractName}Collection = account.borrow<&${contractName}.Collection>(from: ${contractName}.CollectionStoragePath)!
+      let receiver${contractName}CollectionCap = getAccount(receiver).getCapability<&{NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath)
+      self.receiver${contractName}Collection = receiver${contractName}CollectionCap.borrow()?? panic("Canot borrow receiver's collection")
+    `
+
+    let executeScript = ``
+    selectedTokenIDs.map((id) => {
+      let execteStr = `
+
+        self.receiver${contractName}Collection.deposit(token: <- self.sender${contractName}Collection.withdraw(withdrawID: ${id}))
+      `
+      executeScript = executeScript + execteStr
+    })
+
+    importScripts = importScripts + importScript
+    initScripts = initScripts + initScript
+    borrowScripts = borrowScripts + borrowScript
+    executeScripts = executeScripts + executeScript
+  })
+
+  // console.log(importScripts, initScripts, '======')
+  const res = await buildAndSendTrx('batch_send_nfts', [], {
+    importScripts,
+    initScripts,
+    borrowScripts,
+    executeScripts,
+  })
+  console.log(res)
+  return res
 }
 
 export const readPendingTrx = async (address) => {

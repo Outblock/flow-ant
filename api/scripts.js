@@ -493,6 +493,7 @@ const query_private_paths = ({ outdatedPaths }) => {
   `
 }
 
+
 const query_catalog_type_data = fcl.cdc`
 import NFTCatalog from 0xNFTCatalog
 
@@ -728,6 +729,7 @@ export const scripts = {
   query_stored_resource,
   query_nft_metadata_views,
   query_nft_displays,
+  
 }
 
 export const buildAndExecScript = async (key, args = [], opt = {}) => {

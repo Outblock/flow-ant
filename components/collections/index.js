@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   Box,
   Flex,
@@ -10,64 +10,65 @@ import {
   AccordionPanel,
   AccordionIcon,
   SimpleGrid,
+  Button,
 } from '@chakra-ui/react'
+import { useTranslation } from 'next-i18next'
 
-import { bulkGetNftViews } from 'api'
+import { getCollectionsNFTViews } from 'api'
 
 import NFTView from 'components/nftView'
 
 export default function Collections({
   collections = [],
-  onCollectionChange,
+  onChange = () => {},
   address,
 }) {
+  const { t } = useTranslation()
+
   const [displayDatas, setDisplayDatas] = useState({})
 
-  const onChange = async (indexs) => {
-    for (let index of indexs) {
-      const col = collections[index]
-      const { path } = col
-      if (displayDatas[path] == undefined) {
-        const nfts = await bulkGetNftViews(address, col)
-        const datas = { ...displayDatas, [path]: nfts }
-        setDisplayDatas(datas)
-      }
+  const [selectedNFTs, setSelectedNFTs] = useState({})
+
+  useEffect(() => {
+    getCollectionsNFTViews(collections, address).then((res) => {
+      setDisplayDatas(res)
+    })
+  }, [collections, address])
+
+  const onNFTClick = (path, tokenID) => {
+    const selectedArr = selectedNFTs[path] || []
+
+    const index = selectedArr.indexOf(tokenID)
+    if (index >= 0) {
+      selectedArr.splice(index, 1)
+    } else {
+      selectedArr.push(tokenID)
     }
+
+    const data = { ...selectedNFTs, [path]: selectedArr }
+    setSelectedNFTs(data)
+    onChange(data)
   }
 
-  const loadDisplays = async (idx) => {
-    if (collection && account && isValidFlowAddress(account)) {
-      const offset = (displays || []).length
-
-      bulkGetNftViews(account, collection, limit, offset)
-        .then((data) => {
-          setDisplayData(data)
-        })
-        .catch((e) => {
-          const totalTokenIDs = collection.tokenIDs
-          const tokenIDs = totalTokenIDs.slice(offset, offset + limit)
-          const placeholders = {}
-          for (let i = 0; i < tokenIDs.length; i++) {
-            const tokenID = tokenIDs[i]
-            placeholders[tokenID] = {
-              name: collection.contractName,
-              description: '',
-              thumbnail: { url: '' },
-            }
-          }
-          setDisplayData(placeholders)
-          console.error(e)
-        })
+  const handleBatch = (path, ids) => {
+    const selectedArr = selectedNFTs[path] || []
+    let arr = []
+    if (selectedArr.length == ids.length) {
+      arr = []
+    } else {
+      arr = ids
     }
+    const data = { ...selectedNFTs, [path]: arr }
+    setSelectedNFTs(data)
+    onChange(data)
   }
 
   const renderItems = (collection, idx) => {
-    console.log(collection)
     const {
       contractName,
       contract,
       contractAddress = null,
-      tokenIDs,
+      tokenIDs = [],
       type,
       description = '',
       path,
@@ -77,80 +78,109 @@ export default function Collections({
     } = collection
 
     const nftCount = tokenIDs.length
+    const seleNFTs = selectedNFTs[path] || {}
+    const displayNFTs = displayDatas[path] || {}
+    const isSelectAll = nftCount > 0 && Object.keys(seleNFTs).length == nftCount
 
     return (
-      <AccordionItem key={idx}>
-        <h2>
-          <AccordionButton>
-            <Box as="span" flex="1" textAlign="left">
-              {contractName} {`(${nftCount})`}
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4}>
-          <Badge mr={4} colorScheme="green" textTransform="inherit">
-            <Text as="span" color="green.300">{`Contract Name: `}</Text>
-            <Text as="span" color="green.600">{`${contractName}`}</Text>
-          </Badge>
-          {contractAddress && (
-            <Badge
-              mr={4}
-              textTransform="inherit"
-              // onClick={() => {
-              //   router.push(`/account/${contractAddress}`)
-              // }}
-              colorScheme="green"
-            >
-              <Text as="span" color="green.300">{`Contract Address: `}</Text>
-              <Text as="span" color="green.600">{`${contractAddress}`}</Text>
-            </Badge>
-          )}
-          {publicPathIdentifier && (
-            <Badge colorScheme="green" textTransform="inherit">
-              <Text as="span" color="green.300">{`PublicPath ID: `}</Text>
-              <Text as="span" color="green.600">
-                {' '}
-                {`${publicPathIdentifier}`}{' '}
-              </Text>
-            </Badge>
-          )}
-          <Text>{description}</Text>
-
-          <SimpleGrid w="100%" mt={4} columns={3} spacingX="10px" spacingY="20px">
-            {Object.keys(displayDatas[path] || {}).map((nftId, ix) => {
-              const nfts = displayDatas[path]
-              const nftInfo = nfts[nftId]
-
-              const { thumbnail = {} } = nftInfo
-              const { url = undefined } = thumbnail
-
-              return (
-                <Box
-                  key={ix}
-                  bg="gray.200"
-                  border="1px solid gray"
-                  borderRadius="20px"
-                  maxW="160px"
-                  p={4}
+      <>
+        <AccordionItem key={idx}>
+          <h2>
+            <AccordionButton>
+              <Box as="span" flex="1" textAlign="left">
+                {contractName} {`(${nftCount})`}
+              </Box>
+              {nftCount > 0 && (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleBatch(path, tokenIDs)
+                  }}
                 >
-                  <NFTView
-                    display={{ ...nftInfo, tokenID: nftId, imageSrc: url }}
-                  />
-                </Box>
-              )
-            })}
-          </SimpleGrid>
-        </AccordionPanel>
-      </AccordionItem>
+                  {t(isSelectAll ? 'cancle.all' : 'select.all')}
+                </Button>
+              )}
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb={4}>
+            <Badge mr={4} colorScheme="green" textTransform="inherit">
+              <Text as="span" color="green.300">{`Contract Name: `}</Text>
+              <Text as="span" color="green.600">{`${contractName}`}</Text>
+            </Badge>
+            {contractAddress && (
+              <Badge
+                mr={4}
+                textTransform="inherit"
+                // onClick={() => {
+                //   router.push(`/account/${contractAddress}`)
+                // }}
+                colorScheme="green"
+              >
+                <Text as="span" color="green.300">{`Contract Address: `}</Text>
+                <Text as="span" color="green.600">{`${contractAddress}`}</Text>
+              </Badge>
+            )}
+            {publicPathIdentifier && (
+              <Badge colorScheme="green" textTransform="inherit">
+                <Text as="span" color="green.300">{`PublicPath ID: `}</Text>
+                <Text as="span" color="green.600">
+                  {' '}
+                  {`${publicPathIdentifier}`}{' '}
+                </Text>
+              </Badge>
+            )}
+            <Text>{description}</Text>
+
+            <SimpleGrid
+              w="100%"
+              mt={4}
+              columns={3}
+              spacingX="10px"
+              spacingY="20px"
+            >
+              {Object.keys(displayNFTs).map((nftId, ix) => {
+                const nfts = displayDatas[path]
+                const nftInfo = nfts[nftId]
+
+                const isSelected =
+                  (selectedNFTs[path] || []).indexOf(nftId) >= 0
+                const { thumbnail = {} } = nftInfo
+                const { url = undefined } = thumbnail
+
+                return (
+                  <>
+                    <Box
+                      key={ix}
+                      bg={isSelected ? 'green.100' : 'gray.200'}
+                      cursor="pointer"
+                      border="1px solid gray.100"
+                      borderRadius="20px"
+                      maxW="160px"
+                      p={4}
+                      onClick={() => onNFTClick(path, nftId)}
+                    >
+                      <NFTView
+                        display={{
+                          ...nftInfo,
+                          tokenID: nftId,
+                          imageSrc: url,
+                        }}
+                      />
+                    </Box>
+                  </>
+                )
+              })}
+            </SimpleGrid>
+          </AccordionPanel>
+        </AccordionItem>
+      </>
     )
   }
 
   return (
     <>
-      <Accordion allowMultiple onChange={onChange}>
-        {collections.map(renderItems)}
-      </Accordion>
+      <Accordion allowMultiple>{collections.map(renderItems)}</Accordion>
     </>
   )
 }
