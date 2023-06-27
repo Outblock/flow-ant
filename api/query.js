@@ -139,6 +139,17 @@ export const useUserCollection = (address = '', flag = true) => {
       })
     }
 
+    const storedItems = await bulkGetStoredItems(address)
+
+    const nftStorages = storedItems.filter(
+      (item) => item.isNFTCollection && item.tokenIDs.length >= 0,
+    )
+    const catalogs = await bulkGetNftCatalog()
+
+    const nftCollections = collectionsWithExtraData(
+      collectionsWithCatalogInfo(nftStorages, catalogs),
+    )
+
     return {
       collectionIds,
       initState,
@@ -147,6 +158,7 @@ export const useUserCollection = (address = '', flag = true) => {
       defaultDomain,
       accountInfo,
       bals,
+      nftCollections,
     }
   }
 
@@ -224,8 +236,6 @@ export const useAccount = (address) => {
       const nftCollections = collectionsWithExtraData(
         collectionsWithCatalogInfo(nftStorages, catalogs),
       )
-
-      console.log(nftStorages)
 
       return { ...account, nftCollections }
     } catch (error) {

@@ -22,6 +22,7 @@ export default function Collections({
   collections = [],
   onChange = () => {},
   address,
+  isDisable = false,
 }) {
   const { t } = useTranslation()
 
@@ -36,6 +37,9 @@ export default function Collections({
   }, [collections, address])
 
   const onNFTClick = (path, tokenID) => {
+    if (isDisable) {
+      return
+    }
     const selectedArr = selectedNFTs[path] || []
 
     const index = selectedArr.indexOf(tokenID)
@@ -90,7 +94,7 @@ export default function Collections({
               <Box as="span" flex="1" textAlign="left">
                 {contractName} {`(${nftCount})`}
               </Box>
-              {nftCount > 0 && (
+              {nftCount > 0 && !isDisable && (
                 <Button
                   onClick={(e) => {
                     e.preventDefault()

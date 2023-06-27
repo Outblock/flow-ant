@@ -863,14 +863,14 @@ export const buildTransferScripts = async (collections, targetAddress) => {
 
     let initScript = `
 
-      var senderr${contractName}Collection: &${contractName}.Collection
+      var sender${contractName}Collection: &${contractName}.Collection
       var receiver${contractName}Collection: &{NonFungibleToken.Receiver}
     `
 
     let borrowScript = `
 
       self.sender${contractName}Collection = account.borrow<&${contractName}.Collection>(from: ${contractName}.CollectionStoragePath)!
-      let receiver${contractName}CollectionCap = getAccount(receiver).getCapability<&{NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath)
+      let receiver${contractName}CollectionCap = getAccount(${targetAddress}).getCapability<&{NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath)
       self.receiver${contractName}Collection = receiver${contractName}CollectionCap.borrow()?? panic("Canot borrow receiver's collection")
     `
 

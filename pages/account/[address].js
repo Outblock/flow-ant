@@ -4,6 +4,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import ReactGA from 'react-ga'
 import { useRouter } from 'next/router'
 import { FaUsers } from 'react-icons/fa'
+import Collections from 'components/collections'
 
 import {
   Box,
@@ -59,16 +60,17 @@ export default function Account() {
     defaultDomain,
     bals = {},
     accountInfo = {},
+    nftCollections = [],
   } = data
 
   let { keys = [] } = accountInfo
 
-  const { data: accountData = {} } = useSharedAccountInfo(address)
+  // const { data: accountData = {} } = useSharedAccountInfo(address)
 
-  const { accounts = [], pendingTrx } = accountData
-  const isSharedAccount = accounts.length > 0
+  // const { accounts = [], pendingTrx } = accountData
+  // const isSharedAccount = accounts.length > 0
 
-  const hasPendingTrx = pendingTrx && pendingTrx.tx
+  // const hasPendingTrx = pendingTrx && pendingTrx.tx
   const {
     data: nftData = {},
     isFetching,
@@ -146,10 +148,10 @@ export default function Account() {
           <Box>
             <Flex align="center">
               {address}{' '}
-              {isSharedAccount && <Icon m={2} color="green" as={FaUsers} />}
+              {/* {isSharedAccount && <Icon m={2} color="green" as={FaUsers} />} */}
             </Flex>
             <Divider my={4} />
-            <>
+            {/* <>
               {accounts.map((addr, idx) => {
                 const accKeys = accountData[addr]
                 return (
@@ -162,9 +164,9 @@ export default function Account() {
                   </>
                 )
               })}
-            </>
+            </> */}
           </Box>
-          {hasPendingTrx && (
+          {/* {hasPendingTrx && (
             <Alert flex={1} status="info" justifyContent="space-between">
               <AlertIcon />
               <Text>{t('pending.trx.tip')}</Text>
@@ -180,19 +182,25 @@ export default function Account() {
                 }}
               />
             </Alert>
-          )}
+          )} */}
           <Tabs>
             <TabList>
-              <Tab>{t('assets')}</Tab>
+              <Tab>{t('nfts')}</Tab>
               <Tab>{t('transactions')}</Tab>
             </TabList>
 
             <TabPanels>
               <TabPanel>
-                <UserAssets
+                {/* <UserAssets
                   bals={bals}
                   nftPages={pages}
                   renderNFTsLoadingBtn={renderNFTsLoadingBtn}
+                /> */}
+                <Collections
+                  collections={nftCollections}
+                  // onChange={onCollectionChange}
+                  address={user.addr}
+                  isDisable
                 />
               </TabPanel>
               <TabPanel>

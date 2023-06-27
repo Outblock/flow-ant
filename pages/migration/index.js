@@ -133,7 +133,7 @@ export default function Migration() {
   const handleSend = async () => {
     setLoading(true)
     try {
-      const res = await buildTransferScripts(selectedData)
+      const res = await buildTransferScripts(selectedData, targetAddr)
       console.log(res)
       const { status = 0, statusString = '', events } = res
       if (status == 4 || statusString == 'SEALED') {

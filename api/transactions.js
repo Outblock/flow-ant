@@ -724,8 +724,6 @@ const batch_send_nfts = ({
       
     prepare(account: AuthAccount) {
 
-      ${initScripts}
-
       ${borrowScripts}
     }
 
