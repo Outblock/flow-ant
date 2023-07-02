@@ -186,7 +186,7 @@ export default function Account() {
           <Tabs>
             <TabList>
               <Tab>{t('nfts')}</Tab>
-              <Tab>{t('transactions')}</Tab>
+              {/* <Tab>{t('transactions')}</Tab> */}
             </TabList>
 
             <TabPanels>
@@ -203,9 +203,9 @@ export default function Account() {
                   isDisable
                 />
               </TabPanel>
-              <TabPanel>
+              {/* <TabPanel>
                 <Trxs address={address} />
-              </TabPanel>
+              </TabPanel> */}
               {/* <TabPanel>
                 <p>three!</p>
               </TabPanel> */}

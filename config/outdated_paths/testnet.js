@@ -60,6 +60,8 @@ export const outdatedPathsTestnet = {
     /storage/TankAdmin: true,
     /storage/TestAdmin: true,
     /storage/testTokenAVault: true,
+    /storage/FLOATEventsStoragePath003: true,
+    /storage/FLOATCollectionStoragePath: true,
     /storage/kittyItemsCollection: true,
     /storage/KittyItemsCollection000: true,
     /storage/FLOATCollectionStoragePath003: true,

@@ -824,10 +824,10 @@ export const buildInitScripts = async (collections = {}) => {
       if account.getCapability<&{NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath).check() == false {
         if account.borrow<&${contractName}.Collection>(from: ${contractName}.CollectionStoragePath) !=nil {
           account.unlink(${contractName}.CollectionPublicPath)
-          account.link<&${contractName}.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ${contractName}.CollectionPublic}>(${contractName}.CollectionPublicPath, target: ${contractName}.CollectionStoragePath)
+          account.link<&${contractName}.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath, target: ${contractName}.CollectionStoragePath)
         } else {
           account.save(<- ${contractName}.createEmptyCollection(), to: ${contractName}.CollectionStoragePath)
-          account.link<&${contractName}.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, ${contractName}.CollectionPublic}>(${contractName}.CollectionPublicPath, target: ${contractName}.CollectionStoragePath)
+          account.link<&${contractName}.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath, target: ${contractName}.CollectionStoragePath)
         }
       }
 
