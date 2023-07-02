@@ -110,7 +110,10 @@ export default function Migration() {
     })
     setActiveStep(2)
     fcl.logOut()
-    fcl.logIn()
+
+    setTimeout(() => {
+      fcl.logIn()
+    }, 2000)
   }
 
   const handleInit = async () => {
@@ -135,7 +138,9 @@ export default function Migration() {
           isClosable: true,
         })
         fcl.logOut()
-        fcl.logIn()
+        setTimeout(() => {
+          fcl.logIn()
+        }, 2000)
       }
 
       setLoading(false)
