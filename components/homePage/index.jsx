@@ -43,9 +43,9 @@ const Component = ({ children }) => {
         <Center w="100%">
           <Flex px={4} w="100%" align="center" justify="space-between">
             <Button
+              colorScheme="green"
               w="160px"
               borderRadius="full"
-              colorScheme="teal"
               onClick={() => router.push('/account')}
             >
               {t('my.account')}

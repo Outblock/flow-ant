@@ -22,6 +22,7 @@ import {
   Stepper,
   useSteps,
   Spinner,
+  useToast,
 } from '@chakra-ui/react'
 
 import Layout from '../../components/layouts/app'
@@ -37,6 +38,8 @@ import migrationStore from 'stores/migration'
 
 export default function Migration() {
   const router = useRouter()
+  const toast = useToast()
+
   const [, isLogin, fcl] = useCurrentUser()
 
   const { user } = accountStore.useState('user')
@@ -54,7 +57,7 @@ export default function Migration() {
 
   const steps = [
     { title: t('step.first'), description: t('step.first.desc') },
-    { title: t('step.first'), description: t('step.first.desc') },
+    { title: t('step.second'), description: t('step.second.desc') },
     { title: t('step.third'), description: t('step.third.desc') },
   ]
   const { activeStep, setActiveStep } = useSteps({
@@ -72,6 +75,7 @@ export default function Migration() {
 
   const [selectedData, setSelectedData] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [NFTArr, setNFTArr] = useState([])
 
   const onCollectionChange = (selectedCollections) => {
     console.log(selectedCollections, 'collections')
@@ -79,13 +83,16 @@ export default function Migration() {
 
     let datas = {}
     const paths = Object.keys(selectedCollections)
+    let arr = []
     nftCollections.map((col) => {
       const { path } = col
       if (paths.indexOf(path) >= 0) {
         datas[path] = { ...col, selectedTokenIDs: selectedCollections[path] }
+        arr = arr.concat(selectedCollections[path])
       }
     })
     setSelectedData(datas)
+    setNFTArr(arr)
   }
 
   const handleStep2 = async () => {
@@ -103,6 +110,7 @@ export default function Migration() {
     })
     setActiveStep(2)
     fcl.logOut()
+    fcl.logIn()
   }
 
   const handleInit = async () => {
@@ -120,11 +128,24 @@ export default function Migration() {
           targetAddr: user.addr,
         })
         setActiveStep(3)
+        toast({
+          title: t('init.success'),
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
         fcl.logOut()
+        fcl.logIn()
       }
 
       setLoading(false)
     } catch (err) {
+      toast({
+        title: t('init.failed'),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
       console.log(err)
       setLoading(false)
     }
@@ -141,9 +162,21 @@ export default function Migration() {
         console.log(transactionId)
         router.push(`/account/${targetAddr}`)
       }
+      toast({
+        title: t('send.success'),
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
 
       setLoading(false)
     } catch (err) {
+      toast({
+        title: t('send.failed'),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
       console.log(err)
       setLoading(false)
     }
@@ -153,9 +186,30 @@ export default function Migration() {
     if (activeStep == 1) {
       return (
         <Box>
-          <Flex my={4} w="100%" align="center" justify="space-between">
-            <Text>{t('step.first')}</Text>
-            <Button onClick={() => handleStep2()}>Next step</Button>
+          <Flex mb={8} w="100%" align="center" justify="space-between">
+            <Text w="150px" fontWeight={700}>
+              {t('step.first')}
+            </Text>
+            <Flex w="100%" align="center" justify="flex-end">
+              {NFTArr.length ? (
+                <Text mx={2}>
+                  <Text as="span" color="teal" fontWeight={700}>
+                    {NFTArr.length}
+                  </Text>{' '}
+                  {t('nft.selected')}
+                </Text>
+              ) : (
+                <></>
+              )}
+              <Button
+                onClick={() => handleStep2()}
+                borderRadius="full"
+                colorScheme={NFTArr.length > 0 ? 'green' : 'gray'}
+                isDisabled={NFTArr.length == 0}
+              >
+                {t('step.next')}
+              </Button>
+            </Flex>
           </Flex>
           <Collections
             collections={nftCollections}
@@ -168,13 +222,22 @@ export default function Migration() {
       return (
         <Center w="100%" h="100%">
           {user.addr ? (
-            <Button isLoading={loading} onClick={handleInit}>
-              {t('init.collection')}
-            </Button>
+            <Box w="100%">
+              <Button
+                colorScheme="green"
+                borderRadius="full"
+                my={4}
+                isLoading={loading}
+                onClick={handleInit}
+              >
+                {t('init.collection')}
+              </Button>
+              <Text as="div">{t('init.collection.tip')}</Text>
+            </Box>
           ) : (
             <Box textAlign="center" w="100%">
-              <Flex justify="center" align="center">
-                <Spinner mr={4} />
+              <Spinner mb={4} />
+              <Flex justify="center" align="center" mb={4}>
                 <Text fontSize="25px">{t('connect.with.target')}</Text>
               </Flex>
               <Text fontSize="10px" color="gray.600">
@@ -188,14 +251,28 @@ export default function Migration() {
       return (
         <Center w="100%" h="100%">
           {user.addr ? (
-            <Button isLoading={loading} onClick={handleSend}>
-              {t('send.nfts')}
-            </Button>
+            <Box>
+              <Button
+                borderRadius="full"
+                colorScheme="green"
+                isLoading={loading}
+                onClick={handleSend}
+                mb={4}
+                isDisabled={user.addr != sourceAddr}
+              >
+                {t('send.nfts')}
+              </Button>
+              <Text>
+                {t('send.nfts.tip', { count: NFTArr.length, addr: targetAddr })}
+              </Text>
+            </Box>
           ) : (
             <Box textAlign="center" w="100%">
-              <Flex justify="center" align="center">
-                <Spinner mr={4} />
-                <Text fontSize="25px">{t('connect.with.source')}</Text>
+              <Spinner mr={4} />
+              <Flex justify="center" align="center" my={4}>
+                <Text fontSize="25px">
+                  {t('connect.with.source', { addr: sourceAddr })}
+                </Text>
               </Flex>
               <Text fontSize="10px" color="gray.600">
                 {t('step.third.tips')}
@@ -209,10 +286,10 @@ export default function Migration() {
 
   return (
     <Flex w="100%" justify="space-between">
-      <Box w="70%">{renderPanel()}</Box>
-      <Box w="20%">
+      <Box w="67%">{renderPanel()}</Box>
+      <Box w="30%">
         <Stepper
-          w="10%"
+          w="100%"
           index={activeStep}
           colorScheme="green"
           orientation="vertical"
@@ -220,7 +297,7 @@ export default function Migration() {
           gap="0"
         >
           {steps.map((step, index) => (
-            <Step key={index}>
+            <Step w="100%" key={index}>
               <StepIndicator>
                 <StepStatus
                   complete={<StepIcon />}
@@ -229,7 +306,7 @@ export default function Migration() {
                 />
               </StepIndicator>
 
-              <Box flexShrink="0">
+              <Box w="100%" flexShrink="0">
                 <StepTitle>{step.title}</StepTitle>
                 <StepDescription>{step.description}</StepDescription>
               </Box>

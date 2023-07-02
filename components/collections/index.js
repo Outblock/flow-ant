@@ -11,6 +11,7 @@ import {
   AccordionIcon,
   SimpleGrid,
   Button,
+  Center,
 } from '@chakra-ui/react'
 import { useTranslation } from 'next-i18next'
 
@@ -96,6 +97,9 @@ export default function Collections({
               </Box>
               {nftCount > 0 && !isDisable && (
                 <Button
+                  mx={2}
+                  borderRadius="full"
+                  colorScheme={isSelectAll ? 'green' : 'gray'}
                   onClick={(e) => {
                     e.preventDefault()
                     handleBatch(path, tokenIDs)
@@ -129,53 +133,56 @@ export default function Collections({
               <Badge colorScheme="green" textTransform="inherit">
                 <Text as="span" color="green.300">{`PublicPath ID: `}</Text>
                 <Text as="span" color="green.600">
-                  {' '}
                   {`${publicPathIdentifier}`}{' '}
                 </Text>
               </Badge>
             )}
             <Text>{description}</Text>
 
-            <SimpleGrid
-              w="100%"
-              mt={4}
-              columns={3}
-              spacingX="10px"
-              spacingY="20px"
-            >
-              {Object.keys(displayNFTs).map((nftId, ix) => {
-                const nfts = displayDatas[path]
-                const nftInfo = nfts[nftId]
+            {nftCount > 0 ? (
+              <SimpleGrid
+                w="100%"
+                mt={4}
+                columns={3}
+                spacingX="10px"
+                spacingY="20px"
+              >
+                {Object.keys(displayNFTs).map((nftId, ix) => {
+                  const nfts = displayDatas[path]
+                  const nftInfo = nfts[nftId]
 
-                const isSelected =
-                  (selectedNFTs[path] || []).indexOf(nftId) >= 0
-                const { thumbnail = {} } = nftInfo
-                const { url = undefined } = thumbnail
+                  const isSelected =
+                    (selectedNFTs[path] || []).indexOf(nftId) >= 0
+                  const { thumbnail = {} } = nftInfo
+                  const { url = undefined } = thumbnail
 
-                return (
-                  <>
-                    <Box
-                      key={ix}
-                      bg={isSelected ? 'green.100' : 'gray.200'}
-                      cursor="pointer"
-                      border="1px solid gray.100"
-                      borderRadius="20px"
-                      maxW="160px"
-                      p={4}
-                      onClick={() => onNFTClick(path, nftId)}
-                    >
-                      <NFTView
-                        display={{
-                          ...nftInfo,
-                          tokenID: nftId,
-                          imageSrc: url,
-                        }}
-                      />
-                    </Box>
-                  </>
-                )
-              })}
-            </SimpleGrid>
+                  return (
+                    <>
+                      <Box
+                        key={ix}
+                        bg={isSelected ? 'green.100' : 'gray.200'}
+                        cursor="pointer"
+                        border="1px solid gray.100"
+                        borderRadius="20px"
+                        maxW="160px"
+                        p={4}
+                        onClick={() => onNFTClick(path, nftId)}
+                      >
+                        <NFTView
+                          display={{
+                            ...nftInfo,
+                            tokenID: nftId,
+                            imageSrc: url,
+                          }}
+                        />
+                      </Box>
+                    </>
+                  )
+                })}
+              </SimpleGrid>
+            ) : (
+              <Center h="200px">{t('empty')}</Center>
+            )}
           </AccordionPanel>
         </AccordionItem>
       </>

@@ -736,6 +736,44 @@ const batch_send_nfts = ({
   `
 }
 
+const batch_send = fcl.cdc`
+
+import NonFungibleToken from 0x631e88ae7f1d7c20
+
+
+    import MelodyTicket from 0xb797a88390357df4
+  
+
+transaction() {
+
+    
+
+    var senderMelodyTicketCollection: &MelodyTicket.Collection
+    var receiverMelodyTicketCollection: &{NonFungibleToken.Receiver}
+  
+    
+  prepare(account: AuthAccount) {
+
+    
+
+    self.senderMelodyTicketCollection = account.borrow<&MelodyTicket.Collection>(from: MelodyTicket.CollectionStoragePath)!
+    let receiverMelodyTicketCollectionCap = getAccount(0x3b95b322315ffdd6).getCapability<&{NonFungibleToken.Receiver}>(MelodyTicket.CollectionPublicPath)
+    self.receiverMelodyTicketCollection = receiverMelodyTicketCollectionCap.borrow()?? panic("Canot borrow receiver's collection")
+  
+  }
+
+  execute {
+
+    
+
+      self.receiverMelodyTicketCollection.deposit(token: <- self.senderMelodyTicketCollection.withdraw(withdrawID: 13))
+    
+
+  }
+}
+
+`
+
 export const transactions = {
   register_domain,
   register_domain_with_fusd,
@@ -765,6 +803,7 @@ export const transactions = {
   create_account,
   batch_init_nft_storages,
   batch_send_nfts,
+  batch_send
 }
 
 export const buildAndSendTrx = async (key, args = [], opt = {}) => {

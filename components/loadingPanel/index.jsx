@@ -1,5 +1,4 @@
-import { Center, Text } from '@chakra-ui/react'
-import Spinner from 'react-cli-spinners'
+import { Center, Text, Spinner } from '@chakra-ui/react'
 
 export default function Comp(props) {
   const { tip } = props
@@ -7,7 +6,7 @@ export default function Comp(props) {
   return (
     <Center>
       <Text>
-        <Spinner /> &nbsp;&nbsp; {tip}
+        <Spinner my={4} /> &nbsp;&nbsp; {tip}
       </Text>
     </Center>
   )
