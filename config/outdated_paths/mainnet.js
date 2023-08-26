@@ -21,7 +21,8 @@ export const outdatedPathsMainnet = {
     /storage/FuseCollectiveCollection: true,
     /storage/NFTLXKickCollection: true,
     /storage/NFTLXKickMinter: true,
-    /storage/revvTeleportCustodyAdmin: true
+    /storage/revvTeleportCustodyAdmin: true,
+    /storage/MatrixMarketFlowNiaCollection: true
   }
   `,
   public: `
@@ -36,7 +37,8 @@ export const outdatedPathsMainnet = {
     /public/TokenLendingPlace001: true,
     /public/BnGNFTCollection: true,
     /public/FuseCollectiveCollection: true,
-    /public/NFTLXKickCollection: true
+    /public/NFTLXKickCollection: true,
+    /public/MatrixMarketFlowNiaCollection: true
   }
   `,
   private: `
