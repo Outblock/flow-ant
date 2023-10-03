@@ -804,6 +804,45 @@ export const readSharedAccount = async (address) => {
   return data
 }
 
+export const buildQueryScripts = async (collections = {}) => {
+  let paths = Object.keys(collections)
+
+  let importScripts = ``
+  let initScripts = ``
+  paths.map((path) => {
+    const collection = collections[path]
+    console.log(collection)
+    const { contractAddress, contractName } = collection
+    let importScript = `
+
+    import ${contractName} from ${contractAddress}
+
+    `
+
+    let initScript = `
+
+      if account.getCapability<&{NonFungibleToken.Receiver}>(${contractName}.CollectionPublicPath).check() == true {
+       flag = flag && true
+      }
+
+    `
+    importScripts = importScripts + importScript
+    initScripts = initScripts + initScript
+  })
+
+  // console.log(importScripts, initScripts, '======')
+  const res = await buildAndExecScript(
+    'batch_query_nft_resources',
+    [fcl.arg(address, Address)],
+    {
+      importScripts,
+      initScripts,
+    },
+  )
+  console.log(res)
+  return res
+}
+
 export const buildInitScripts = async (collections = {}) => {
   let paths = Object.keys(collections)
 

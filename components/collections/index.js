@@ -154,7 +154,12 @@ export default function Collections({
                   const isSelected =
                     (selectedNFTs[path] || []).indexOf(nftId) >= 0
                   const { thumbnail = {} } = nftInfo
-                  const { url = undefined } = thumbnail
+                  console.log(thumbnail)
+                  let { url = undefined, cid = undefined } = thumbnail
+
+                  if (cid) {
+                    url = `https://ipfs.io/ipfs/${cid}`
+                  }
 
                   return (
                     <>

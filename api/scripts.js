@@ -311,6 +311,25 @@ const query_stroage_paths = ({ outdatedPaths }) => {
   `
 }
 
+const batch_query_nft_resources = ({ importScripts, initScripts }) => {
+  return fcl.cdc`
+
+  ${importScripts}
+
+  
+  pub fun main(address: Address): Bool {
+
+    let flag = true
+    let account = getAuthAccount(address)
+
+
+    ${initScripts}
+  
+    return flag
+  }
+  `
+}
+
 const query_stored_items = () => {
   return fcl.cdc`
   import FungibleToken from 0xFungibleToken
@@ -492,7 +511,6 @@ const query_private_paths = ({ outdatedPaths }) => {
     }
   `
 }
-
 
 const query_catalog_type_data = fcl.cdc`
 import NFTCatalog from 0xNFTCatalog
@@ -729,7 +747,7 @@ export const scripts = {
   query_stored_resource,
   query_nft_metadata_views,
   query_nft_displays,
-  
+  batch_query_nft_resources,
 }
 
 export const buildAndExecScript = async (key, args = [], opt = {}) => {
