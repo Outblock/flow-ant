@@ -8,6 +8,7 @@ const store = new Rekv({
   flowBalance: 0.0,
   tokenBals: {},
   accountInfo: {},
+  tokenList: [],
 })
 
 export const ifOwner = (address = '') => {

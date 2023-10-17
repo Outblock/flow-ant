@@ -103,6 +103,11 @@ export default function Migration() {
     if (!selectedData || selectedData == {}) {
       return
     }
+
+    // query resource
+
+    
+
     migrationStore.setState({
       selectedData,
       currentStep: 2,

@@ -30,6 +30,7 @@
     "cors": "^2.8.5",
     "eth-ens-namehash": "^2.0.8",
     "firebase": "^10.0.0",
+    "flow-native-token-registry": "^0.1.4",
     "formik": "^2.2.9",
     "formik-chakra-ui": "^1.6.1",
     "framer-motion": "^4",

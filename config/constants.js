@@ -1,3 +1,4 @@
+
 export const discoveryUrl = process.env.NEXT_PUBLIC_DISCOVERY_URL
 
 export const discoveryEndpointUrl =
@@ -88,7 +89,8 @@ export const navLinks = {
 
 export const appNavLinks = {
   account: '/account',
-  migration: '/migration',
+  migrationNFT: '/migration/nft',
+  migrationFT: '/migration/ft',
 }
 
 export const links = {

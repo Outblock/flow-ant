@@ -30,6 +30,7 @@ import {
   postQuery,
   collectionsWithCatalogInfo,
   collectionsWithExtraData,
+  getTokenList,
 } from '../utils'
 
 import {
@@ -237,7 +238,13 @@ export const useAccount = (address) => {
         collectionsWithCatalogInfo(nftStorages, catalogs),
       )
 
-      return { ...account, nftCollections }
+      const vaults = storedItems.filter((item) => item.isVault)
+
+      const tokenList = await getTokenList()
+
+      accountStore.setState({ tokenList })
+
+      return { ...account, nftCollections, vaults }
     } catch (error) {
       console.log(error)
       return {}

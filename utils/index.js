@@ -7,6 +7,7 @@ import { normalize, chineseReg } from './hash'
 import { send as httpSend } from '@onflow/transport-http'
 import { send as grpcSend } from '@onflow/transport-grpc'
 import { init } from '@onflow/fcl-wc'
+import { TokenListProvider, ENV, Strategy } from 'flow-native-token-registry'
 
 import {
   nodeUrl,
@@ -516,4 +517,36 @@ export const getContractLink = (contractUUID) => {
   } else {
     return `${publicConfig.flowscanURL}/contract/${contractUUID}`
   }
+}
+
+export const getTokenList = async () => {
+  let env = ENV.Mainnet
+  if (network === 'testnet') {
+    env = ENV.Testnet
+  }
+
+  return new TokenListProvider()
+    .resolve(Strategy.GitHub, env)
+    .then((tokens) => {
+      const tokenList = tokens.getList().map((token) => {
+        token.id = `${token.address.replace('0x', 'A.')}.${token.contractName}`
+        return token
+      })
+      return tokenList
+    })
+}
+
+
+export const formatBalancesData = (balances) => {
+  return balances.map((data) => {
+    const resource = getResourceType(data.type)
+    const contract = resource.replace(".Vault", "")
+    let comps = contract.split(".")
+    let contractName = comps[comps.length - 1]
+    return {
+      balance: data.balance,
+      contract: contract,
+      contractName: contractName
+    }
+  })
 }
