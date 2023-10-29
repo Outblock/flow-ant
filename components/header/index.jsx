@@ -137,30 +137,31 @@ const Components = ({ children }) => {
   const renderAccBtn = () => {
     return (
       <Center>
-        {/* <SwitchTheme /> */}
-        <Button
-          colorScheme="green"
-          borderRadius="full"
-          mx={2}
-          minW={{ base: '20px', md: '120px' }}
-          h={{ base: '36px', md: '36px' }}
-          onClick={() => {
-            if (!isLogin) {
-              fcl.logIn()
-            } else {
-              onOpen()
-            }
-          }}
-        >
-          {isLogin ? (
-            <>
-              {isPC && <>{renderDomain(user.addr)}&nbsp;</>}{' '}
-              <Icon as={MdMenuOpen} />
-            </>
-          ) : (
-            t('connect')
-          )}
-        </Button>
+        {isLogin && (
+          <Button
+            colorScheme="green"
+            borderRadius="full"
+            mx={2}
+            minW={{ base: '20px', md: '120px' }}
+            h={{ base: '36px', md: '36px' }}
+            onClick={() => {
+              if (!isLogin) {
+                fcl.logIn()
+              } else {
+                onOpen()
+              }
+            }}
+          >
+            {isLogin ? (
+              <>
+                {isPC && <>{renderDomain(user.addr)}&nbsp;</>}{' '}
+                <Icon as={MdMenuOpen} />
+              </>
+            ) : (
+              t('connect')
+            )}
+          </Button>
+        )}
         {isLogin && (
           <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
             <DrawerOverlay />
@@ -247,6 +248,23 @@ const Components = ({ children }) => {
             </DrawerContent>
           </Drawer>
         )}
+        {isLogin && (
+          <Button
+            size="full"
+            variant="outline"
+            borderRadius="full"
+            colorScheme="green"
+            w="100%"
+            h="40px"
+            fontSize="20px"
+            onClick={() => {
+              fcl.logOut()
+            }}
+            // leftIcon={<Icon as={MdPowerSettingsNew} />}
+          >
+            {t('logout')}
+          </Button>
+        )}
       </Center>
     )
   }
@@ -268,9 +286,11 @@ const Components = ({ children }) => {
           <Logo />
           {!isPC && renderAccBtn()}
         </Flex>
-        <Center w={['100%', '100%', '80%']} h="100%">
-          <Navs links={appNavLinks} />
-        </Center>
+        {isLogin && (
+          <Center w={['100%', '100%', '80%']} h="100%">
+            <Navs links={appNavLinks} />
+          </Center>
+        )}
         {isPC && renderAccBtn()}
       </Stack>
     </>

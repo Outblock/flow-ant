@@ -1,4 +1,4 @@
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 import { sendTrx } from '../utils'
 import { getSupportTokenConfig, network } from '../config/constants'
 

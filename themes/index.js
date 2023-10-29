@@ -44,7 +44,7 @@ const overrides = {
     },
     h2: {
       fontSize: '20px',
-      fontWeight: 400,
+      fontWeight: 600,
       letterSpacing: '-2%',
     },
     h3: {
@@ -58,8 +58,8 @@ const overrides = {
       fontWeight: 300,
     },
     desc: {
-      fontSize: '14px',
-      fontWeight: 300,
+      fontSize: '16px',
+      fontWeight: 400,
       opacity: 0.8,
     },
     label: {
@@ -72,6 +72,11 @@ const overrides = {
     },
     text: {
       fontSize: '14px',
+    },
+    title: {
+      fontSize: '32px',
+      fontWeight: 500,
+      textColor: 'rgba(255, 255, 255, 0.8)',
     },
   },
 }

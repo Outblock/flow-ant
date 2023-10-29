@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'next/router'
 
 import { useTranslation } from 'next-i18next'
+import useCurrentUser from '../../hooks/currentUser'
 
 const Component = ({ children }) => {
   const { t } = useTranslation('common')
@@ -20,46 +21,68 @@ const Component = ({ children }) => {
   const [isPC = true] = useMediaQuery('(min-width: 48em)')
   const router = useRouter()
   const gradientBg = 'linear-gradient(270deg, #0B6623 7.86%, #21D27D 100%)'
+  const [user, isLogin, fcl] = useCurrentUser()
+
+  useEffect(() => {
+    if (isLogin) {
+      router.push('/account')
+    }
+  }, [isLogin])
 
   return (
     <>
-      <Stack
-        direction={['column', 'column', 'row']}
-        h={['100%', '100%', 'calc(100vh - 400px)']}
-      >
+      <Stack h={['100%', '100%', 'calc(100vh - 400px)']}>
         <Box
-          h={['520px', '520px', '100%']}
+          h={['320px', '320px', '100%']}
           pt={[4, 4, 10]}
           w={['100%', '100%', '100%']}
         >
-          <Text h="108px" textStyle="h1" bgGradient={gradientBg} bgClip="text">
+          <Text h="108px" textColor="#00EF8B" fontSize="48px" fontWeight={700}>
             {t('title')}
-            <span id="title"></span>
           </Text>
-          <Text mt={2} h={['94px', '94px', '128px']} textStyle="desc">
+          <Text mt={2} mb={8} textStyle="desc">
             {t('title.desc')}
           </Text>
         </Box>
+
+        <Flex justify="space-between">
+          <Box m={2} p={8} borderRadius="24px" bg="rgba(0, 0, 0, 0.16)">
+            <Text mb={6} textColor="#85E2AD" fontSize="24px" fontWeight={600}>
+              {t('step')} 01
+            </Text>
+            <Text textStyle="desc">{t('step.one')}</Text>
+          </Box>
+          <Box m={2} p={8} borderRadius="24px" bg="rgba(0, 0, 0, 0.16)">
+            <Text mb={6} textColor="#85E2AD" fontSize="24px" fontWeight={600}>
+              {t('step')} 02
+            </Text>
+            <Text textStyle="desc">{t('step.two')}</Text>
+          </Box>
+          <Box m={2} p={8} borderRadius="24px" bg="rgba(0, 0, 0, 0.16)">
+            <Text mb={6} textColor="#85E2AD" fontSize="24px" fontWeight={600}>
+              {t('step')} 03
+            </Text>
+            <Text textStyle="desc">{t('step.three')}</Text>
+          </Box>
+        </Flex>
         <Center w="100%">
-          <Flex px={4} w="100%" align="center" justify="space-between">
+          <Flex
+            mt="64px"
+            px={4}
+            w="100%"
+            align="center"
+            justify="space-between"
+          >
             <Button
               colorScheme="green"
               w="160px"
               borderRadius="full"
-              onClick={() => router.push('/account')}
+              onClick={() => fcl.logIn()}
             >
-              {t('my.account')}
+              {t('connect.tip')}
             </Button>
           </Flex>
         </Center>
-
-        <Divider
-          w="1px"
-          height="100%"
-          orientation="vertical"
-          border="1px solid"
-          opacity="0.12"
-        />
       </Stack>
     </>
   )

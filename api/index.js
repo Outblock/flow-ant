@@ -1,4 +1,4 @@
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 import { UInt64, Address, UFix64, Array, UInt8 } from '@onflow/types'
 import * as t from '@onflow/types'
 import { buildAndExecScript } from './scripts'
@@ -851,7 +851,8 @@ export const buildInitScripts = async (collections = {}) => {
   paths.map((path) => {
     const collection = collections[path]
     console.log(collection)
-    const { contractAddress, contractName } = collection
+    let { contractAddress, contractName, contract } = collection
+    contractAddress = contractAddress || `0x${contract.split('.')[1]}`
     let importScript = `
 
     import ${contractName} from ${contractAddress}
@@ -894,7 +895,13 @@ export const buildTransferScripts = async (collections, targetAddress) => {
   paths.map((path) => {
     const collection = collections[path]
     console.log(collection)
-    const { contractAddress, contractName, selectedTokenIDs = [] } = collection
+    let {
+      contractAddress,
+      contractName,
+      selectedTokenIDs = [],
+      contract,
+    } = collection
+    contractAddress = contractAddress || `0x${contract.split('.')[1]}`
     let importScript = `
 
       import ${contractName} from ${contractAddress}

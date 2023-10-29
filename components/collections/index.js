@@ -19,11 +19,15 @@ import { getCollectionsNFTViews } from 'api'
 
 import NFTView from 'components/nftView'
 
+import { AiFillCheckCircle } from 'react-icons/ai'
+
 export default function Collections({
   collections = [],
   onChange = () => {},
   address,
   isDisable = false,
+  nftDatas = {},
+  showSelectOnly = false,
 }) {
   const { t } = useTranslation()
 
@@ -34,6 +38,7 @@ export default function Collections({
   useEffect(() => {
     getCollectionsNFTViews(collections, address).then((res) => {
       setDisplayDatas(res)
+      
     })
   }, [collections, address])
 
@@ -68,7 +73,7 @@ export default function Collections({
     onChange(data)
   }
 
-  const renderItems = (collection, idx) => {
+  const renderItems = (collection, idx, filterIds = []) => {
     const {
       contractName,
       contract,
@@ -82,35 +87,51 @@ export default function Collections({
       publicPathIdentifier,
     } = collection
 
-    const nftCount = tokenIDs.length
+    let nftCount = filterIds.length > 0 ? filterIds.length : tokenIDs.length
     const seleNFTs = selectedNFTs[path] || {}
-    const displayNFTs = displayDatas[path] || {}
+    let displayNFTs = displayDatas[path] || {}
     const isSelectAll = nftCount > 0 && Object.keys(seleNFTs).length == nftCount
 
+    if (filterIds && filterIds.length > 0) {
+      let selectMap = {}
+      filterIds.map((k) => {
+        selectMap[k] = displayNFTs[k]
+      })
+      displayNFTs = selectMap
+    }
     return (
       <>
-        <AccordionItem key={idx}>
-          <h2>
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                {contractName} {`(${nftCount})`}
-              </Box>
-              {nftCount > 0 && !isDisable && (
-                <Button
-                  mx={2}
-                  borderRadius="full"
-                  colorScheme={isSelectAll ? 'green' : 'gray'}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleBatch(path, tokenIDs)
-                  }}
-                >
-                  {t(isSelectAll ? 'cancle.all' : 'select.all')}
-                </Button>
-              )}
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
+        <AccordionItem key={idx} isDisabled={nftCount == 0}>
+          <AccordionButton fontSize="14px" fontWeight={400}>
+            <AccordionIcon ml={-4} mr={4} colorScheme="green" />
+            <Box as="span" flex="1" textAlign="left">
+              {contractName}
+              <Badge
+                ml={2}
+                variant="solid"
+                colorScheme="gray"
+                lineHeight="24px"
+              >
+                {nftCount}
+              </Badge>
+            </Box>
+
+            {nftCount > 0 && !isDisable && !showSelectOnly && (
+              <Button
+                mx={2}
+                borderRadius="full"
+                height="24px"
+                fontSize="12px"
+                colorScheme={isSelectAll ? 'green' : 'gray'}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleBatch(path, tokenIDs)
+                }}
+              >
+                {isSelectAll ? <AiFillCheckCircle /> : t('select.all')}
+              </Button>
+            )}
+          </AccordionButton>
           <AccordionPanel pb={4}>
             <Badge mr={4} colorScheme="green" textTransform="inherit">
               <Text as="span" color="green.300">{`Contract Name: `}</Text>
@@ -194,9 +215,32 @@ export default function Collections({
     )
   }
 
+  if (showSelectOnly) {
+    const keys = Object.keys(nftDatas)
+    const filterCollection = collections.filter(
+      (c) => keys.indexOf(c.path) >= 0,
+    )
+    return (
+      <>
+        <Accordion allowMultiple>
+          {filterCollection.map((col, idx) => {
+            const path = col.path
+            const tokenIds = nftDatas[path].selectedTokenIDs
+            if (tokenIds.length == 0) {
+              return null
+            }
+            return renderItems(col, idx, tokenIds)
+          })}
+        </Accordion>
+      </>
+    )
+  }
+
   return (
     <>
-      <Accordion allowMultiple>{collections.map(renderItems)}</Accordion>
+      <Accordion allowMultiple>
+        {collections.map((c, idx) => renderItems(c, idx))}
+      </Accordion>
     </>
   )
 }

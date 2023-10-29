@@ -13,7 +13,7 @@ import {
   AlertTitle,
   AlertDescription,
 } from '@chakra-ui/react'
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 
 import { useTranslation } from 'next-i18next'
 import createModal from 'stores/createModal'

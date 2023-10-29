@@ -23,6 +23,7 @@ import { initDomainCollection } from '../../api'
 import { toast } from '../../utils'
 import PendingTrxModal from 'components/pendingTrxModal'
 import migrationStore from 'stores/migration'
+import useCurrentUser from '../../hooks/currentUser'
 
 export default function Layout({ children }) {
   fclinit()
@@ -38,6 +39,7 @@ export default function Layout({ children }) {
     colorMode === 'light' ? theme.colors.lightPrimary : theme.colors.primary
   const { user = {} } = accountStore.useState('user')
   const { addr = '' } = user
+  const [, isLogin, fcl] = useCurrentUser()
 
   const { currentStep } = migrationStore.useState('currentStep')
 
@@ -70,7 +72,18 @@ export default function Layout({ children }) {
   }
 
   const renderConnectPanel = () => {
-    return <Center>{t('connect.tip')}</Center>
+    return (
+      <Center h="calc(100vh - 240px)">
+        <Button
+          colorScheme="green"
+          w="160px"
+          borderRadius="full"
+          onClick={() => fcl.logIn()}
+        >
+          {t('connect.tip')}
+        </Button>
+      </Center>
+    )
   }
 
   const renderChildren = () => {
@@ -84,10 +97,8 @@ export default function Layout({ children }) {
         <title>Flow Ant</title>
       </Head>
       <main>
-        <Container px={['5%', '15%']} w="100%" h="100%" maxW="1440px">
+        <Container px={['5%', '80px']} w="100%" h="100%" maxW="1440px">
           <Header />
-
-          <Box py={[5, 5, 10]} pr={18}></Box>
           {addr || currentStep >= 1 ? renderChildren() : renderConnectPanel()}
         </Container>
         <PendingTrxModal />

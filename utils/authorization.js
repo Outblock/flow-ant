@@ -1,4 +1,4 @@
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 
 import axios from 'axios'
 import { ec as EC } from "elliptic";

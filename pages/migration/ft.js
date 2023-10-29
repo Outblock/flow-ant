@@ -281,7 +281,7 @@ export default function Migration() {
       )
     } else {
       return (
-        <Center w="100%" h="100%">
+        <Center w="100%" h="100%" >
           {user.addr ? (
             <Box>
               <Button

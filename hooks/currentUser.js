@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 // import { fclinit } from '../utils'
 import accountStore from '../stores/account'
 

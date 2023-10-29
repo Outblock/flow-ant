@@ -3,7 +3,7 @@ import {
   // useMutation,
   useInfiniteQuery,
 } from 'react-query'
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 
 import { rootNames } from '../config/constants'
 import domainStore from '../stores/domains'
@@ -289,50 +289,8 @@ export const useNFTs = (address, limit = 10) => {
   })
 }
 
-export const useSharedAccoounts = (address) => {
-  const query = async () => {
-    try {
-      if (address == null || address.length === 0) {
-        return {}
-      }
-      const res = await readSharedAccounts(address)
-      const { sharedAccount = [] } = res
-      const reqs = sharedAccount.map((acc) => {
-        return readPendingTrx(acc)
-      })
-      const pendingTrxs = await Promise.all(reqs)
 
-      sharedAccount.map((acc, idx) => {
-        res[acc].pendingTrx = pendingTrxs[idx]
-      })
-      return res
-    } catch (error) {
-      console.log(error)
-      return {}
-    }
-  }
 
-  return useQuery(`${GET_SHARED_ACCOUNTS}-${address}`, query)
-}
-
-export const useSharedAccountInfo = (address) => {
-  const query = async () => {
-    try {
-      if (address == null || address.length === 0) {
-        return {}
-      }
-      const res = await readSharedAccount(address)
-      const pendingTrx = await readPendingTrx(address)
-      res.pendingTrx = pendingTrx
-      return res
-    } catch (error) {
-      console.log(error)
-      return {}
-    }
-  }
-
-  return useQuery(`${GET_ACCOUNTS_INFO}-${address}`, query)
-}
 
 export const useTrxs = (address, limit = 10) => {
   const query = async (config) => {

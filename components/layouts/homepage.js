@@ -36,33 +36,8 @@ export default function Layout({ children }) {
       </Head>
       <main>
         <Container w="100%" maxW="1440px" maxH="1600px">
-          <Divider
-            h="1px"
-            pos="absolute"
-            top={['98px', '98px', '144px']}
-            left="0"
-            w="100vw"
-            border="1px solid"
-            opacity="0.12"
-          />
           {children}
-          <Divider
-            h="1px"
-            pos="absolute"
-            bottom="256"
-            left="0"
-            w="100vw"
-            border="1px solid"
-            opacity="0.12"
-          />
         </Container>
-        {/* <Center pos='fixed' bottom={0} w='100%' h='48px' bgColor={primary}>
-          <Flex w='100%' p={2} alignItems='center' overflowX='scroll'>
-            <Text as='div' minW='80px' textStyle='label' textColor='textPrimary' opacity='1'>
-              {t('partners')}:
-            </Text>
-          </Flex>
-        </Center> */}
       </main>
     </>
   )

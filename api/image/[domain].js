@@ -1,4 +1,4 @@
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 import { String } from '@onflow/types'
 
 import html2image from '../../../../html2image'

@@ -12,7 +12,7 @@ import {
   Box,
 } from '@chakra-ui/react'
 
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 import dynamic from 'next/dynamic'
 
 import { useTranslation } from 'next-i18next'

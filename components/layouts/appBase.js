@@ -10,6 +10,7 @@ import { useUserCollection } from 'api/query'
 import accountStore from 'stores/account'
 import TransferModal from 'components/transferModal'
 import PendingTrxModal from 'components/pendingTrxModal'
+// import useCurrentUser from '../../hooks/currentUser'
 
 export default function Layout({ children }) {
   fclinit()
@@ -18,6 +19,7 @@ export default function Layout({ children }) {
   // const { pathname } = router
   const { user = {} } = accountStore.useState('user')
   const { addr = '' } = user
+  // const [, isLogin, fcl] = useCurrentUser()
 
   const { refetch } = useUserCollection(addr)
 
@@ -34,9 +36,8 @@ export default function Layout({ children }) {
         <title>Flow Ant</title>
       </Head>
       <main>
-        <Container px={['5%', '15%']} w="100%" h="100%" maxW="1440px">
+        <Container px={['5%', '80px']} w="100%" h="100%" maxW="1440px">
           <Header />
-
           {/* <Box py={[2, 2, 4]} pr={18}></Box> */}
           {renderChildren()}
         </Container>

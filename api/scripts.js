@@ -1,4 +1,4 @@
-import * as fcl from '@onflow/fcl'
+import * as fcl from '@blocto/fcl'
 import { execScript } from '../utils'
 import { getSupportTokenVaultPath } from '../config/constants'
 const check_domain_collection = fcl.cdc`
