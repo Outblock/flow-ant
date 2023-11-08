@@ -305,7 +305,7 @@ export const depositeDomainVault = async (hash, token, amount) => {
 }
 
 export const transferNFT = async (type, id, to) => {
-  console.log(type, id, to)
+  // console.log(type, id, to)
   const receiever = isFlowAddr(to)
     ? to
     : await queryDomainRecord(...to.split('.'))
@@ -850,7 +850,7 @@ export const buildFTInitScripts = async (tokens = {}) => {
   let initScripts = ``
   addressStrs.map((addrs) => {
     const token = tokens[addrs]
-    console.log(token)
+    // console.log(token)
     let { contract, contractName, path } = token
     const { vault, receiver, balance } = path
     let contractAddress = `0x${contract.split('.')[1]}`
@@ -901,7 +901,7 @@ export const buildFTTransferScripts = async (tokens, targetAddress) => {
   let executeScripts = ``
   paths.map((p) => {
     const token = tokens[p]
-    console.log(token)
+    // console.log(token)
     let { contract, contractName, path, balance: amount } = token
     const { vault, receiver, balance } = path
 

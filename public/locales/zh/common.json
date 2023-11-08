@@ -70,5 +70,7 @@
     "step.three": "Reconnect to your Wallet B, your assets are all settled.",
     "all.nft": "ALL NFTs",
     "selected.nft": "NFTs Sellected",
-    "nft.title": "Migrate NFT"
+    "nft.title": "Migrate NFT",
+    "select.tokens": "Select tokens",
+    "selected.tokens": "Selected tokens"
 }

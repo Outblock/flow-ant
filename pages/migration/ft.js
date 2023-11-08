@@ -159,7 +159,7 @@ export default function Migration() {
       const { status = 0, statusString = '', events } = res
       if (status == 4 || statusString == 'SEALED') {
         const { transactionId } = events[0]
-        console.log(transactionId)
+        // console.log(transactionId)
         migrationStore.setState({
           selectedData,
           currentStep: 3,
@@ -192,7 +192,7 @@ export default function Migration() {
   }
 
   const onSelect = (token, bal) => {
-    console.log(token, bal)
+    // console.log(token, bal)
 
     const { contract, balance } = token
 
@@ -221,7 +221,7 @@ export default function Migration() {
       const { status = 0, statusString = '', events } = res
       if (status == 4 || statusString == 'SEALED') {
         const { transactionId } = events[0]
-        console.log(transactionId)
+        // console.log(transactionId)
         router.push(`/account/${targetAddr}`)
       }
       toast({
@@ -255,7 +255,7 @@ export default function Migration() {
       >
         <Flex mb={8} w="100%" align="center" justify="space-between">
           <Text w="150px" fontWeight={700}>
-            {t('step.first')}
+            {t('selected.tokens')}
           </Text>
           <Flex w="100%" align="center" justify="flex-end"></Flex>
         </Flex>
@@ -279,7 +279,7 @@ export default function Migration() {
       <Box p={8} bg="rgba(0, 0, 0, 0.16)" borderRadius={4} minH="500px">
         <Flex mb={8} w="100%" align="center" justify="space-between">
           <Text w="150px" fontWeight={700}>
-            {t('step.first')}
+            {t('select.tokens')}
           </Text>
           <Flex w="100%" align="center" justify="flex-end"></Flex>
         </Flex>

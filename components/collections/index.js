@@ -175,7 +175,7 @@ export default function Collections({
                   const isSelected =
                     (selectedNFTs[path] || []).indexOf(nftId) >= 0
                   const { thumbnail = {} } = nftInfo
-                  console.log(thumbnail)
+                  // console.log(thumbnail)
                   let { url = undefined, cid = undefined } = thumbnail
 
                   if (cid) {
