@@ -706,7 +706,49 @@ const batch_init_nft_storages = ({ importScripts = '', initScripts = '' }) => {
   }
   `
 }
+const batch_init_ft_token = ({ importScripts = '', initScripts = '' }) => {
+  return fcl.cdc`
+  
+  import FungibleToken from 0xFungibleToken
 
+  ${importScripts}
+  
+  transaction() {
+    prepare(signer: AuthAccount) {
+      ${initScripts}
+    }
+  }
+  `
+}
+
+const batch_send_fts = ({
+  importScripts = '',
+  initScripts = '',
+  borrowScripts = '',
+  executeScripts = '',
+}) => {
+  return fcl.cdc`
+  
+  import FungibleToken from 0xFungibleToken
+
+  ${importScripts}
+  
+  transaction() {
+
+      ${initScripts}
+      
+    prepare(signer: AuthAccount) {
+      ${borrowScripts}
+    }
+
+    execute {
+
+      ${executeScripts}
+
+    }
+  }
+  `
+}
 const batch_send_nfts = ({
   importScripts = '',
   initScripts = '',
@@ -803,7 +845,9 @@ export const transactions = {
   create_account,
   batch_init_nft_storages,
   batch_send_nfts,
-  batch_send
+  batch_send,
+  batch_init_ft_token,
+  batch_send_fts,
 }
 
 export const buildAndSendTrx = async (key, args = [], opt = {}) => {

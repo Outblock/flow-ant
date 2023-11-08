@@ -843,6 +843,111 @@ export const buildQueryScripts = async (collections = {}) => {
   return res
 }
 
+export const buildFTInitScripts = async (tokens = {}) => {
+  let addressStrs = Object.keys(tokens)
+
+  let importScripts = ``
+  let initScripts = ``
+  addressStrs.map((addrs) => {
+    const token = tokens[addrs]
+    console.log(token)
+    let { contract, contractName, path } = token
+    const { vault, receiver, balance } = path
+    let contractAddress = `0x${contract.split('.')[1]}`
+    let importScript = `
+
+    import ${contractName} from ${contractAddress}
+
+    `
+
+    let initScript = `
+
+    if(signer.borrow<&${contractName}.Vault>(from: ${vault}) != nil) {
+      return
+    } else {
+      signer.save(<- ${contractName}.createEmptyVault(), to: ${vault})
+
+      signer.link<&${contractName}.Vault{FungibleToken.Receiver}>(
+          ${receiver},
+          target: ${vault}
+      )
+  
+      signer.link<&${contractName}.Vault{FungibleToken.Balance}>(
+          ${balance},
+          target: ${vault}
+      )
+    }
+
+    `
+    importScripts = importScripts + importScript
+    initScripts = initScripts + initScript
+  })
+
+  // console.log(importScripts, initScripts, '======')
+  const res = await buildAndSendTrx('batch_init_ft_token', [], {
+    importScripts,
+    initScripts,
+  })
+  console.log(res)
+  return res
+}
+
+export const buildFTTransferScripts = async (tokens, targetAddress) => {
+  let paths = Object.keys(tokens)
+
+  let importScripts = ``
+  let initScripts = ``
+  let borrowScripts = ``
+  let executeScripts = ``
+  paths.map((p) => {
+    const token = tokens[p]
+    console.log(token)
+    let { contract, contractName, path, balance: amount } = token
+    const { vault, receiver, balance } = path
+
+    let contractAddress = contractAddress || `0x${contract.split('.')[1]}`
+    let importScript = `
+    import ${contractName} from ${contractAddress}
+
+    `
+
+    let initScript = `
+    let sent${contractName}Vault: @FungibleToken.Vault
+    `
+
+    let borrowScript = `
+    let vault${contractName}Ref = signer.borrow<&${contractName}.Vault>(from: ${vault})
+    ?? panic("Err owner Vault!")
+    self.sent${contractName}Vault <- vault${contractName}Ref.withdraw(amount: ${Number(
+      amount,
+    ).toFixed(2)})
+
+    `
+
+    let executeScript = `
+      let recipient${contractName} = getAccount(${targetAddress})
+      let receiver${contractName}Ref = recipient${contractName}.getCapability(${receiver})!.borrow<&{FungibleToken.Receiver}>() ?? panic("Err recipient Vault")
+      receiver${contractName}Ref.deposit(from: <-self.sent${contractName}Vault)
+
+    `
+
+    importScripts = importScripts + importScript
+    initScripts = initScripts + initScript
+    borrowScripts = borrowScripts + borrowScript
+    executeScripts = executeScripts + executeScript
+  })
+
+  // console.log(importScripts, initScripts, '======')
+  const res = await buildAndSendTrx('batch_send_fts', [], {
+    importScripts,
+    initScripts,
+    borrowScripts,
+    executeScripts,
+  })
+  console.log(res)
+  return res
+}
+
 export const buildInitScripts = async (collections = {}) => {
   let paths = Object.keys(collections)
 
