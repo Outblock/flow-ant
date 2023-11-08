@@ -60,9 +60,9 @@ export default function Migration() {
     )
 
   const steps = [
-    { title: t('step.first'), description: t('step.first.desc') },
-    { title: t('step.second'), description: t('step.second.desc') },
-    { title: t('step.third'), description: t('step.third.desc') },
+    { title: t('step.first.ft'), description: t('step.first.desc.ft') },
+    { title: t('step.second.ft'), description: t('step.second.desc.ft') },
+    { title: t('step.third.ft'), description: t('step.third.desc.ft') },
   ]
   const { activeStep, setActiveStep } = useSteps({
     index: 1,
